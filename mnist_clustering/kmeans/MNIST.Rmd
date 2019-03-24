@@ -1,0 +1,87 @@
+---
+title: "Clustering MNIST"
+output: 
+  html_document:
+    keep_md: true
+---
+
+
+```{r}
+mnist <- read.csv("mnist_train.csv")
+```
+
+```{r}
+ncol(mnist)
+```
+
+```{r}
+nrow(mnist)
+```
+
+```{r}
+colnames(mnist)
+```
+
+Dataset contains 28X28 pixels of images and a label column
+
+Representation of a image
+
+```{r}
+visualize_image <- function(input){
+  temp <- matrix(as.numeric(input), 28, 28)
+  temp <- temp[,ncol(temp):1]
+  return( image(temp, axes = FALSE, col=gray((0:255)/255),useRaster = T))
+}
+```
+
+
+
+```{r}
+apply(mnist[1:10,-1],1,visualize_image)
+```
+
+Label for the above image
+```{r}
+mnist[1,1]
+```
+
+
+
+```{r}
+mnist_1n8 <- mnist[mnist[1]==1 | mnist[1]==8,]
+```
+
+12593 observations of 785 variables
+
+For clustering, we remove the label attribute
+
+```{r}
+mnist_1n8_nolabel <- mnist_1n8[,-1]
+```
+
+784 observations (pixels : 28x28)
+
+
+```{r}
+clus <- kmeans(mnist_1n8_nolabel, centers = 2, iter.max = 50, nstart = 50)
+```
+
+```{r}
+head(clus$cluster)
+```
+
+Changing the cluster label 2 to 8 and attaching to actual data
+
+```{r}
+mnist_1n8$clabel <- clus$cluster
+mnist_1n8$clabel[mnist_1n8$clabel==2] <- 8
+```
+
+```{r}
+summary(as.factor(mnist_1n8$label))
+```
+
+```{r}
+summary(as.factor(mnist_1n8$clabel))
+```
+
